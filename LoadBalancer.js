@@ -34,7 +34,10 @@ export default class LoadBalancer {
           this.j = 1;
 
     }
-    this.j = this.j + 1;
+    else{this.j = this.j + 1;
+      
+    }
+    
     console.log(server.power);
 
     // Envía la petición al servidor y devuelve su respuesta al cliente.
