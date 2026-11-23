@@ -12,9 +12,9 @@ export default class LoadBalancer {
     //   activeProgress: 0.25 // Progreso de 0 a 1 (0 si está libre)
     // }
     // Los datos son de solo lectura y se actualizan durante la simulación.
-    this.i = 0;
-    this.servers = Object.freeze([...servers]);
-    this.j = 1;
+    this.next = 0;
+    this.rotation = servers.flatMap((server) => Array(server.power).fill(server.id)); //Array de longitud del power del server y lo rellena con su id p.ej. power4 id2 [2,2,2,2]
+
   }
 
   async onRequestArrival(request, sendToServer) {
@@ -24,21 +24,20 @@ export default class LoadBalancer {
     //   payload: "08319462", // Datos que envía el cliente
     //   work: 4              // Unidades de trabajo necesarias
     // }
-    let total = this.servers.length
-    if (this.i >= total){
-      this.i = 0;
-    }
-    const server = this.servers[this.i];
-    if (this.j >= server.power){
-          this.i = this.i + 1;
-          this.j = 1;
 
+    let minimo = Infinity;
+    for(const servidor in this.servers){
+      if (servidor.queuedRequests < minimo){
+        minimo = servidor.queuedRequests;
+      }
     }
-    else{this.j = this.j + 1;
-      
+
+    const server = this.rotation[this.next];
+    this.next= (this.next + 1) % this.rotation.length; // %=modulo coge el resto de la división entera
+    if (server.queuedRequests = minimo){
+       const server = this.rotation[this.next];
+      this.next= (this.next + 1) // %=modulo coge el resto de la división entera
     }
-    
-    console.log(server.power);
 
     // Envía la petición al servidor y devuelve su respuesta al cliente.
     return sendToServer(server.id);
